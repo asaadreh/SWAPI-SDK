@@ -15,7 +15,7 @@ class ViewController: UIViewController {
         
         let api = StarWarsAPI()
         
-//        api.getOne(resource: "people", withId: 1, requiredAttributes: ["height","gender"]) { res in
+//        api.getOneWithId(resource: "people", withId: 1, requiredAttributes: ["height","gender"]) { res in
 //            switch res {
 //            case .success(let attribute):
 //                print(attribute)
@@ -25,8 +25,8 @@ class ViewController: UIViewController {
 //        }
         
         api.getAll(resource: "films",
-                   requiredAttribute: ["title","opening_crawl","release_date"]) { res in
-            
+                   requiredAttributes: ["title","opening_crawl","release_date"]) { res in
+
                 switch res {
                 case .success(let attribute):
                     print(attribute)

@@ -32,27 +32,17 @@ class StarWarsAPI {
         
         print(url.absoluteString)
         
-        let session = URLSession(configuration: .default)
-        let dataTask = session.dataTask(with: url) {data, response, error in
-            guard error == nil else {
-                completion(.failure(.connectionError))
-                return
-            }
-            
-            guard response != nil,
-                  let data = data else {
-                completion(.failure(.connectionError))
-                return
-            }
-            
+        do {
+            let data = try Data(contentsOf: url)
             let result = self.findAttributes(attributes: attributes, in: data)
-                completion(.success(result))
+            completion(.success(result))
+        } catch {
+            completion(.failure(APIErrors.attributeNotFound))
         }
-        dataTask.resume()
         
     }
     
-    public func getAll(resource: String, requiredAttribute attribute: [String], completion: @escaping APIResultAll) {
+    public func getAll(resource: String, requiredAttributes attributes: [String], completion: @escaping APIResultAll) {
         // creating URL
         guard let url = createURL(path: resource, id: nil) else {
             completion(.failure(.urlCreationError))
@@ -62,67 +52,24 @@ class StarWarsAPI {
         print(url.absoluteString)
         
         // Getting Data from Server
-        let recordsToFetch = 15
-        let currentRecord = 0
-        while currentRecord < recordsToFetch {
-            do {
-                let data = try Data(contentsOf: url)
-                let result = self.findAttributesForAll(attributes: attribute, in: data)
-                completion(.success(result))
-            } catch {
-                completion(.failure(APIErrors.attributeNotFound))
-            }
-        }
         
-        
-        
-        
-        
-//        dataTask(url: url) { data, response, error in
-//            guard error == nil else {
-//                completion(.failure(.connectionError))
-//                return
-//            }
-//
-//            guard response != nil,
-//                  let data = data else {
-//                completion(.failure(.connectionError))
-//                return
-//            }
-//
-//            let result = self.findAttributesForAll(attributes: attribute, in: data)
-//            completion(.success(result))
-//        }
-    }
-    
-    
-    private func dataTask(url: URL, completion: @escaping (Data?, URLResponse?, Error?)->Void) {
-        let session = URLSession(configuration: .default)
-        let dataTask = session.dataTask(with: url) {data, response, error in
-            completion(data,response,error)
-        }
-        dataTask.resume()
-    }
-    
-    private func findAttributeForAll(attribute: String, in data: Data) -> [String:Any] {
-        var res = [String:Any]()
         do {
-            if let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                
-                let results = json["results"] as! [[String:Any]]
-                
-                for result in results {
-                    let name = result["name"] as! String
-                    let attribute = result[attribute]
-                    
-                    res[name] = attribute
-                }
-            }
+            let data = try Data(contentsOf: url)
+            let result = self.findAttributesForAll(attributes: attributes, in: data)
+            completion(.success(result))
         } catch {
-            print(error.localizedDescription)
+            completion(.failure(APIErrors.attributeNotFound))
         }
-        return res
     }
+    
+    
+//    private func dataTask(url: URL, completion: @escaping (Data?, URLResponse?, Error?)->Void) {
+//        let session = URLSession(configuration: .default)
+//        let dataTask = session.dataTask(with: url) {data, response, error in
+//            completion(data,response,error)
+//        }
+//        dataTask.resume()
+//    }
     
     
     private func findAttributesForAll(attributes: [String], in data: Data) -> [[String:Any]] {
