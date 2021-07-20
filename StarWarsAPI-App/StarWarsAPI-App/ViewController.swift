@@ -24,8 +24,8 @@ class ViewController: UIViewController {
 //            }
 //        }
         
-        api.getAll(resource: "films",
-                   requiredAttributes: ["title","opening_crawl","release_date"]) { res in
+        api.getAll(resource: "people",
+                   requiredAttributes: ["height","gender"]) { res in
 
                 switch res {
                 case .success(let attribute):
